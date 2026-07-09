@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="TDU Class Hub">
+  <rect width="512" height="512" fill="#2878d7"/>
+  <circle cx="256" cy="256" r="214" fill="#eaf4ff"/>
+  <rect x="111" y="132" width="290" height="248" rx="36" fill="#ffffff"/>
+  <path fill="#2878d7" d="M148 176h216v34H148zM148 238h216v34H148zM148 300h140v34H148z"/>
+  <circle cx="339" cy="319" r="36" fill="#f8bad4"/>
+  <path fill="#182634" d="M172 166h36v184h-36zM238 166h36v184h-36z"/>
+</svg>

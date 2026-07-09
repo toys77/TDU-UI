@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>TDU Class Hub</title>
+    <meta name="description" content="時間割を起点に授業詳細、課題提出、通知を確認できる学内情報アプリです。" />
+    <meta name="theme-color" content="#2878d7" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Class Hub" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="icon" href="icons/icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="icons/icon-192.png" />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <div class="phone-shell">
+      <main>
+        <section class="page is-active" data-page="timetable" aria-label="時間割">
+          <div class="term-header">
+            <h1>2026年 1学期</h1>
+            <button class="term-switch" type="button">学期切替</button>
+          </div>
+
+          <div class="timetable-wrap">
+            <div class="timetable-grid" id="timetable-grid" aria-label="週間時間割"></div>
+          </div>
+        </section>
+
+        <section class="page" data-page="assignments" aria-label="課題提出">
+          <div class="simple-header">
+            <h1>課題提出</h1>
+            <p>提出が必要な課題と締切をまとめて表示します。</p>
+          </div>
+          <div class="info-list">
+            <article>
+              <strong>人間中心設計 期末レポート草案</strong>
+              <span>締切: 2026/07/10 23:59。提出ファイルを選択して送信する想定の画面です。</span>
+            </article>
+            <article>
+              <strong>コンピュータプログラムII 演習課題</strong>
+              <span>締切: 2026/07/12 18:00。再提出可否や受付番号をここに表示します。</span>
+            </article>
+          </div>
+        </section>
+
+        <section class="page" data-page="notifications" aria-label="通知">
+          <div class="simple-header">
+            <h1>通知</h1>
+            <p>授業連絡、教室変更、締切リマインドをまとめて確認します。</p>
+          </div>
+          <div class="info-list">
+            <article>
+              <strong>人間中心設計: 資料が追加されました</strong>
+              <span>第12回資料と期末レポートのガイドラインを確認してください。</span>
+            </article>
+            <article>
+              <strong>英語演習: 教室変更</strong>
+              <span>木曜1限の教室が5303に変更されました。</span>
+            </article>
+          </div>
+        </section>
+
+        <section class="page" data-page="mypage" aria-label="マイページ">
+          <div class="simple-header">
+            <h1>マイページ</h1>
+            <p>学生情報、通知設定、表示設定を置く想定の画面です。</p>
+          </div>
+          <div class="profile-card">
+            <div class="avatar">K</div>
+            <div>
+              <strong>加藤 拓海</strong>
+              <span>工学部 2年 / TDU Class Hub</span>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <nav class="bottom-nav" aria-label="メニュー">
+        <button class="nav-item is-active" type="button" data-nav-page="timetable">
+          <span class="nav-icon">▦</span>
+          <span>時間割</span>
+        </button>
+        <button class="nav-item" type="button" data-nav-page="assignments">
+          <span class="nav-icon">□</span>
+          <span>課題提出</span>
+        </button>
+        <button class="nav-item" type="button" data-nav-page="notifications">
+          <span class="nav-icon">◇</span>
+          <span>通知</span>
+        </button>
+        <button class="nav-item" type="button" data-nav-page="mypage">
+          <span class="nav-icon">○</span>
+          <span>マイページ</span>
+        </button>
+      </nav>
+    </div>
+
+    <dialog id="course-dialog" aria-label="授業詳細">
+      <div class="dialog-card">
+        <button class="dialog-close" type="button" data-close-dialog>閉じる</button>
+        <div id="course-detail"></div>
+      </div>
+    </dialog>
+  </body>
+</html>
