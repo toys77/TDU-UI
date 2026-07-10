@@ -1,9 +1,9 @@
-const CACHE_NAME = "tdu-class-hub-v9";
+const CACHE_NAME = "tdu-class-hub-v12";
 const APP_SHELL = [
   "./",
   "./index.html",
-  "./styles.css?v=9",
-  "./app.js?v=9",
+  "./styles.css?v=12",
+  "./app.js?v=12",
   "./manifest.webmanifest",
   "./icons/icon.svg",
   "./icons/icon-192.png",

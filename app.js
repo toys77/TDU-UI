@@ -29,6 +29,7 @@ const courses = [
 const timetableGrid = document.querySelector("#timetable-grid");
 const dialog = document.querySelector("#course-dialog");
 const detail = document.querySelector("#course-detail");
+let courseDialogTrigger = null;
 
 renderTimetable();
 initializeNavigation();
@@ -39,6 +40,7 @@ document.addEventListener("click", (event) => {
   const nav = event.target.closest("[data-nav-page]");
   const lesson = event.target.closest("[data-course-id]");
   const detailTab = event.target.closest("[data-detail-tab]");
+  const belongingsToggle = event.target.closest("[data-toggle-belongings-notice]");
   const close = event.target.closest("[data-close-dialog]");
 
   if (nav) {
@@ -49,14 +51,29 @@ document.addEventListener("click", (event) => {
     setDetailPanel(detailTab.dataset.detailTab);
   }
 
+  if (belongingsToggle) {
+    toggleBelongingsNotice(belongingsToggle);
+  }
+
   if (lesson) {
+    courseDialogTrigger = lesson;
     openCourseDetail(lesson.dataset.courseId);
   }
 
   if (close) {
-    dialog.close();
+    closeCourseDialog();
   }
 });
+
+dialog.addEventListener("click", (event) => {
+  if (event.target === dialog) closeCourseDialog();
+});
+
+dialog.addEventListener("close", () => {
+  courseDialogTrigger?.focus();
+});
+
+dialog.addEventListener("keydown", trapDialogFocus);
 
 function course(id, day, period, title, room, color, teacher, summary) {
   return {
@@ -68,6 +85,7 @@ function course(id, day, period, title, room, color, teacher, summary) {
     color,
     teacher,
     summary,
+    belongings: title === "人間中心設計" ? "レビュー用メモ、プロトタイプ画面案、ノートPC" : "授業ノート、筆記用具、前回資料",
     task: "次回までに授業資料を確認してください。",
     material: `${title}_第${period}回資料.pdf`,
     syllabus: `${title}では、授業の到達目標、評価方法、毎回の学習内容を確認できます。出席、課題提出、小テストを総合して評価します。`,
@@ -101,55 +119,144 @@ function openCourseDetail(courseId) {
   const item = courses.find((entry) => entry.id === courseId);
   if (!item) return;
 
-  detail.innerHTML = `<div class="detail-hero ${item.color}">
-      <h2>${escapeHtml(item.title)}</h2>
+  const courseTime = periods[item.period - 1].time.replace(/\n-\n/g, "–");
+  detail.innerHTML = `<div class="detail-shell">
+    <header class="detail-hero ${item.color}">
+      <div class="detail-title-row">
+        <h2 id="course-detail-title">${escapeHtml(item.title)}</h2>
+        <button class="dialog-close" type="button" data-close-dialog aria-label="授業詳細を閉じる">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg>
+        </button>
+      </div>
       <div class="detail-meta">
         <span>${escapeHtml(item.day)}曜 ${item.period}限</span>
-        <span>${periods[item.period - 1].time.replace(/\n/g, "")}</span>
+        <span>${courseTime}</span>
         <span>${escapeHtml(item.room)}</span>
       </div>
-    </div>
-    <div class="detail-tabs" role="tablist" aria-label="授業詳細メニュー">
-      <button class="detail-tab is-active" type="button" data-detail-tab="syllabus">シラバスを表示</button>
-      <button class="detail-tab" type="button" data-detail-tab="mail">教授にメールを送る</button>
-    </div>
-    <div class="detail-action-row">
-      <button class="materials-button" type="button" data-detail-tab="materials">授業資料を表示</button>
-    </div>
-    <section class="detail-panel is-active" data-detail-panel="syllabus">
-      <h3>シラバス</h3>
-      <p>${escapeHtml(item.syllabus)}</p>
-    </section>
-    <section class="detail-panel" data-detail-panel="mail">
-      <div class="mail-draft">
-        <h3>教授へのメール</h3>
-        <span>宛先: ${escapeHtml(item.teacher)} &lt;${escapeHtml(item.teacherMail)}&gt;</span>
-        <textarea aria-label="教授へのメール本文">先生、${escapeHtml(item.title)}について質問があります。</textarea>
-        <button class="send-preview" type="button">下書きを保存</button>
+    </header>
+    <div class="detail-scroll">
+      <section class="belongings-highlight">
+        <div class="belongings-heading">
+          <h3>次回の持ち物</h3>
+          <button class="belongings-notice" type="button" data-toggle-belongings-notice aria-pressed="true">
+            <span class="notice-state-dot" aria-hidden="true"></span><span data-notice-label>通知ON</span>
+          </button>
+        </div>
+        ${belongingsList(item.belongings)}
+      </section>
+      <div class="detail-actions" aria-label="授業関連アクション">
+        <button class="materials-button" type="button" data-detail-tab="materials">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 4h6a3 3 0 0 1 3 3v13a3 3 0 0 0-3-3H4Z"/><path d="M20 4h-6a3 3 0 0 0-3 3v13a3 3 0 0 1 3-3h6Z"/></svg>
+          授業資料を表示
+        </button>
+        <div class="detail-secondary-actions">
+          <button class="detail-tab is-active" type="button" data-detail-tab="syllabus">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z"/><path d="M14 3v5h5M8 13h7M8 17h7"/></svg>
+            シラバスを表示
+          </button>
+          <button class="detail-tab" type="button" data-detail-tab="mail">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+            教授にメールを送る
+          </button>
+        </div>
       </div>
-    </section>
-    <section class="detail-panel" data-detail-panel="materials">
-      <h3>授業資料</h3>
-      <p>${escapeHtml(item.material)}</p>
-    </section>
-    <div class="detail-body">
-      <section class="detail-section">
-        <h3>担当教員</h3>
-        <p>${escapeHtml(item.teacher)}</p>
+      <section class="detail-panel is-active syllabus-panel" data-detail-panel="syllabus">
+        <h3>シラバス</h3>
+        <p>${escapeHtml(item.syllabus)}</p>
       </section>
-      <section class="detail-section">
-        <h3>授業概要</h3>
-        <p>${escapeHtml(item.summary)}</p>
+      <section class="detail-panel" data-detail-panel="mail">
+        <div class="mail-draft">
+          <h3>教授へのメール</h3>
+          <span>宛先: ${escapeHtml(item.teacher)} &lt;${escapeHtml(item.teacherMail)}&gt;</span>
+          <textarea aria-label="教授へのメール本文">先生、${escapeHtml(item.title)}について質問があります。</textarea>
+          <button class="send-preview" type="button">下書きを保存</button>
+        </div>
       </section>
-      <section class="detail-section">
-        <h3>連絡・課題</h3>
-        <p>${escapeHtml(item.task)}</p>
+      <section class="detail-panel" data-detail-panel="materials">
+        <h3>授業資料</h3>
+        <p class="material-note">第1回から第14回までの資料を選択できます。各項目はプロトタイプ用のダミーファイルです。</p>
+        ${materialList(item)}
       </section>
-    </div>`;
+      <section class="course-info-card" aria-label="授業情報">
+        <div class="course-info-row"><span>担当教員</span><strong>${escapeHtml(item.teacher)}</strong></div>
+        <div class="course-info-row"><span>教室</span><strong>${escapeHtml(item.room)}</strong></div>
+        <div class="course-info-row"><span>授業時間</span><strong>${courseTime}</strong></div>
+      </section>
+      <div class="detail-body">
+        <section class="detail-section">
+          <h3>授業概要</h3>
+          <p>${escapeHtml(item.summary)}</p>
+        </section>
+        <section class="detail-section">
+          <h3>連絡・課題</h3>
+          <p>${escapeHtml(item.task)}</p>
+        </section>
+      </div>
+    </div>
+  </div>`;
 
   if (typeof dialog.showModal === "function") {
     dialog.showModal();
+    detail.querySelector("[data-close-dialog]")?.focus();
   }
+}
+
+function toggleBelongingsNotice(button) {
+  const nextState = button.getAttribute("aria-pressed") !== "true";
+  button.setAttribute("aria-pressed", String(nextState));
+  const label = button.querySelector("[data-notice-label]");
+  if (label) label.textContent = nextState ? "通知ON" : "通知OFF";
+  button.classList.toggle("is-off", !nextState);
+}
+
+function belongingsList(value) {
+  const items = String(value).split("、").map((item) => item.trim()).filter(Boolean);
+  return `<ul class="belongings-list">${items.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`;
+}
+
+function closeCourseDialog() {
+  if (dialog.open) dialog.close();
+}
+
+function trapDialogFocus(event) {
+  if (event.key !== "Tab") return;
+  const focusable = [...dialog.querySelectorAll("button:not([disabled]), a[href], textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex='-1'])")];
+  if (!focusable.length) return;
+  const first = focusable[0];
+  const last = focusable[focusable.length - 1];
+  if (event.shiftKey && document.activeElement === first) {
+    event.preventDefault();
+    last.focus();
+  } else if (!event.shiftKey && document.activeElement === last) {
+    event.preventDefault();
+    first.focus();
+  }
+}
+
+function materialList(item) {
+  return `<div class="material-list" aria-label="${escapeHtml(item.title)}の授業資料一覧">
+    ${Array.from({ length: 14 }, (_, index) => materialLink(item, index + 1)).join("")}
+  </div>`;
+}
+
+function materialLink(item, number) {
+  const numberLabel = String(number).padStart(2, "0");
+  const fileName = `${sanitizeFileName(item.title)}_第${numberLabel}回資料.pdf`;
+  const dummyText = [
+    `${item.title} 第${number}回 授業資料`,
+    "これはプロトタイプ用のダミーファイルです。",
+    `担当教員: ${item.teacher}`,
+    `教室: ${item.room}`
+  ].join("\n");
+  const href = `data:text/plain;charset=utf-8,${encodeURIComponent(dummyText)}`;
+
+  return `<a class="material-item" href="${escapeHtml(href)}" download="${escapeHtml(fileName)}" aria-label="${escapeHtml(item.title)} 第${number}回資料をダウンロード">
+    <span>
+      <strong>第${number}回</strong>
+      <small>授業資料</small>
+    </span>
+    <em>DL</em>
+  </a>`;
 }
 
 function setDetailPanel(panelName) {
@@ -201,6 +308,7 @@ function updateDeadlineCountdowns() {
     const hours = Math.ceil(diffMs / (1000 * 60 * 60));
     if (hours < 24) {
       badge.textContent = `あと${hours}時間`;
+      badge.classList.add("is-urgent");
       return;
     }
 
@@ -215,6 +323,10 @@ function escapeHtml(value) {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
+}
+
+function sanitizeFileName(value) {
+  return String(value).replace(/[\\/:*?"<>|]/g, "_");
 }
 
 function registerServiceWorker() {

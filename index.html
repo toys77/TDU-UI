@@ -13,15 +13,15 @@
     <link rel="manifest" href="manifest.webmanifest" />
     <link rel="icon" href="icons/icon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="icons/icon-192.png" />
-    <link rel="stylesheet" href="styles.css?v=9" />
-    <script src="app.js?v=9" defer></script>
+    <link rel="stylesheet" href="styles.css?v=12" />
+    <script src="app.js?v=12" defer></script>
   </head>
   <body>
     <div class="phone-shell">
       <main>
         <section class="page is-active" data-page="timetable" aria-label="時間割">
           <div class="term-header">
-            <h1>2026年 1学期</h1>
+            <h1>2026年度 前期</h1>
             <button class="term-switch" type="button">学期切替</button>
           </div>
 
@@ -33,7 +33,7 @@
         <section class="page" data-page="assignments" aria-label="課題提出">
           <div class="simple-header">
             <h1>課題提出</h1>
-            <p>課題、次回の持ち物、通知設定をまとめて確認します。</p>
+            <p>課題と通知設定をまとめて確認します。</p>
           </div>
           <div class="assignment-dashboard">
             <article class="mini-card accent-card">
@@ -69,12 +69,6 @@
               </div>
               <button class="mini-action" type="button">提出</button>
             </article>
-            <article class="mini-card">
-              <div>
-                <strong>次回の持ち物</strong>
-                <span>レビュー用メモ、プロトタイプ画面案、ノートPC</span>
-              </div>
-            </article>
             <article class="setting-card">
               <div>
                 <strong>通知設定</strong>
@@ -105,16 +99,44 @@
             <h1>通知</h1>
             <p>授業連絡、教室変更、締切リマインドをまとめて確認します。</p>
           </div>
-          <div class="info-list">
-            <article>
+          <div class="info-list notification-list">
+            <article class="notification-item is-unread" tabindex="0">
+              <span class="unread-dot" aria-label="未読"></span>
               <strong>人間中心設計: 資料が追加されました</strong>
               <time class="notification-time" datetime="2026-07-09T14:08:00+09:00">2026/07/09 14:08</time>
-              <span>第12回資料と期末レポートのガイドラインを確認してください。</span>
+              <span class="item-preview">第12回資料と期末レポートのガイドラインを確認してください。</span>
             </article>
-            <article>
+            <article class="notification-item is-unread" tabindex="0">
+              <span class="unread-dot" aria-label="未読"></span>
               <strong>英語演習: 教室変更</strong>
               <time class="notification-time" datetime="2026-07-09T13:30:00+09:00">2026/07/09 13:30</time>
-              <span>木曜1限の教室が5303に変更されました。</span>
+              <span class="item-preview">木曜1限の教室が5303に変更されました。</span>
+            </article>
+            <article class="notification-item is-unread" tabindex="0">
+              <span class="unread-dot" aria-label="未読"></span>
+              <strong>人間中心設計: 課題締切が近づいています</strong>
+              <time class="notification-time" datetime="2026-07-10T09:00:00+09:00">2026/07/10 09:00</time>
+              <span class="item-preview">期末レポート草案の提出期限は本日23:59です。</span>
+            </article>
+            <article class="notification-item" tabindex="0">
+              <strong>コンピュータプログラムII: 演習課題が公開されました</strong>
+              <time class="notification-time" datetime="2026-07-10T10:15:00+09:00">2026/07/10 10:15</time>
+              <span class="item-preview">配列とDOM操作に関する演習課題を確認してください。</span>
+            </article>
+            <article class="notification-item" tabindex="0">
+              <strong>回路理論および演習: 小テスト解答の提出確認</strong>
+              <time class="notification-time" datetime="2026-07-08T18:20:00+09:00">2026/07/08 18:20</time>
+              <span class="item-preview">解答ファイルの提出状況を課題提出ページで確認できます。</span>
+            </article>
+            <article class="notification-item" tabindex="0">
+              <strong>デザイン工学PBL-A: チーム資料提出依頼</strong>
+              <time class="notification-time" datetime="2026-07-08T12:05:00+09:00">2026/07/08 12:05</time>
+              <span class="item-preview">次回授業までにプロトタイプの進捗資料を提出してください。</span>
+            </article>
+            <article class="notification-item" tabindex="0">
+              <strong>教務課: 前期試験日程が更新されました</strong>
+              <time class="notification-time" datetime="2026-07-07T16:45:00+09:00">2026/07/07 16:45</time>
+              <span class="item-preview">最新の試験日程をポータルで確認してください。</span>
             </article>
           </div>
         </section>
@@ -125,16 +147,24 @@
             <p>授業に関係するメールを優先表示します。</p>
           </div>
           <div class="mail-actions">
-            <button class="compose-button" type="button">メールを作成</button>
+            <button class="compose-button" type="button">
+              <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"/></svg>
+              メールを作成
+            </button>
           </div>
-          <div class="info-list">
-            <article>
-              <strong>鈴木先生: レポート草案の確認</strong>
-              <span>期末レポートのレビュー結果を反映してから提出してください。</span>
+          <div class="info-list mail-list">
+            <article class="mail-item is-unread" tabindex="0">
+              <span class="unread-dot" aria-label="未読"></span>
+              <span class="mail-sender">鈴木先生</span>
+              <time datetime="2026-07-10T11:42:00+09:00">7/10 11:42</time>
+              <strong>レポート草案の確認</strong>
+              <span class="item-preview">期末レポートのレビュー結果を反映してから提出してください。</span>
             </article>
-            <article>
-              <strong>教務課: 休講情報のお知らせ</strong>
-              <span>休講・補講情報は時間割にも反映されます。</span>
+            <article class="mail-item" tabindex="0">
+              <span class="mail-sender">教務課</span>
+              <time datetime="2026-07-09T16:20:00+09:00">7/9 16:20</time>
+              <strong>休講情報のお知らせ</strong>
+              <span class="item-preview">休講・補講情報は時間割にも反映されます。</span>
             </article>
           </div>
         </section>
@@ -146,41 +176,49 @@
           </div>
           <div class="profile-card">
             <div class="avatar">K</div>
-            <div>
+            <div class="profile-copy">
               <strong>加藤 拓海</strong>
               <span>工学部 2年 / TDU Class Hub</span>
             </div>
+            <span class="row-chevron" aria-hidden="true">›</span>
+          </div>
+          <div class="settings-list" aria-label="設定メニュー">
+            <button class="setting-row" type="button"><span class="setting-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span><span>アカウント情報</span><span class="row-chevron" aria-hidden="true">›</span></button>
+            <button class="setting-row" type="button"><span class="setting-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg></span><span>通知設定</span><span class="row-chevron" aria-hidden="true">›</span></button>
+            <button class="setting-row" type="button"><span class="setting-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg></span><span>表示設定</span><span class="row-chevron" aria-hidden="true">›</span></button>
+            <button class="setting-row" type="button"><span class="setting-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg></span><span>学期・時間割設定</span><span class="row-chevron" aria-hidden="true">›</span></button>
+            <button class="setting-row" type="button"><span class="setting-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></span><span>アプリ情報</span><span class="row-chevron" aria-hidden="true">›</span></button>
+            <button class="setting-row is-danger" type="button"><span class="setting-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M10 17l5-5-5-5M15 12H3M15 3h5v18h-5"/></svg></span><span>ログアウト</span><span class="row-chevron" aria-hidden="true">›</span></button>
           </div>
         </section>
       </main>
 
       <nav class="bottom-nav" aria-label="メニュー">
         <button class="nav-item is-active" type="button" data-nav-page="timetable">
-          <span class="nav-icon">▦</span>
+          <span class="nav-icon"><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 3v18M15 3v18"/></svg></span>
           <span>時間割</span>
         </button>
         <button class="nav-item" type="button" data-nav-page="assignments">
-          <span class="nav-icon">□</span>
+          <span class="nav-icon"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M9 5h10a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Z"/><path d="M7 9H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h8M11 10h6M11 14h6M11 18h4"/></svg></span>
           <span>課題提出</span>
         </button>
         <button class="nav-item" type="button" data-nav-page="notifications">
-          <span class="nav-icon">◇</span>
+          <span class="nav-icon"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg></span>
           <span>通知</span>
         </button>
         <button class="nav-item" type="button" data-nav-page="mail">
-          <span class="nav-icon">✉</span>
+          <span class="nav-icon"><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg></span>
           <span>メール</span>
         </button>
         <button class="nav-item" type="button" data-nav-page="mypage">
-          <span class="nav-icon">○</span>
+          <span class="nav-icon"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span>
           <span>マイページ</span>
         </button>
       </nav>
     </div>
 
-    <dialog id="course-dialog" aria-label="授業詳細">
+    <dialog id="course-dialog" role="dialog" aria-modal="true" aria-labelledby="course-detail-title">
       <div class="dialog-card">
-        <button class="dialog-close" type="button" data-close-dialog>閉じる</button>
         <div id="course-detail"></div>
       </div>
     </dialog>
