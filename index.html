@@ -13,8 +13,8 @@
     <link rel="manifest" href="manifest.webmanifest" />
     <link rel="icon" href="icons/icon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="icons/icon-192.png" />
-    <link rel="stylesheet" href="styles.css" />
-    <script src="app.js" defer></script>
+    <link rel="stylesheet" href="styles.css?v=9" />
+    <script src="app.js?v=9" defer></script>
   </head>
   <body>
     <div class="phone-shell">
@@ -33,16 +33,69 @@
         <section class="page" data-page="assignments" aria-label="課題提出">
           <div class="simple-header">
             <h1>課題提出</h1>
-            <p>提出が必要な課題と締切をまとめて表示します。</p>
+            <p>課題、次回の持ち物、通知設定をまとめて確認します。</p>
           </div>
-          <div class="info-list">
-            <article>
-              <strong>人間中心設計 期末レポート草案</strong>
-              <span>締切: 2026/07/10 23:59。提出ファイルを選択して送信する想定の画面です。</span>
+          <div class="assignment-dashboard">
+            <article class="mini-card accent-card">
+              <div>
+                <strong>人間中心設計 期末レポート草案</strong>
+                <div class="deadline-line" aria-label="課題締切">
+                  <span class="deadline-label">締切</span>
+                  <time class="deadline-date" datetime="2026-07-10T23:59:00+09:00">7/10 23:59</time>
+                  <span class="countdown-badge">計算中</span>
+                </div>
+              </div>
+              <button class="mini-action" type="button">提出</button>
             </article>
-            <article>
-              <strong>コンピュータプログラムII 演習課題</strong>
-              <span>締切: 2026/07/12 18:00。再提出可否や受付番号をここに表示します。</span>
+            <article class="mini-card accent-card">
+              <div>
+                <strong>コンピュータプログラムII 演習課題</strong>
+                <div class="deadline-line" aria-label="課題締切">
+                  <span class="deadline-label">締切</span>
+                  <time class="deadline-date" datetime="2026-07-12T18:00:00+09:00">7/12 18:00</time>
+                  <span class="countdown-badge">計算中</span>
+                </div>
+              </div>
+              <button class="mini-action" type="button">提出</button>
+            </article>
+            <article class="mini-card accent-card">
+              <div>
+                <strong>回路理論および演習 小テスト解答</strong>
+                <div class="deadline-line" aria-label="課題締切">
+                  <span class="deadline-label">締切</span>
+                  <time class="deadline-date" datetime="2026-07-15T12:00:00+09:00">7/15 12:00</time>
+                  <span class="countdown-badge">計算中</span>
+                </div>
+              </div>
+              <button class="mini-action" type="button">提出</button>
+            </article>
+            <article class="mini-card">
+              <div>
+                <strong>次回の持ち物</strong>
+                <span>レビュー用メモ、プロトタイプ画面案、ノートPC</span>
+              </div>
+            </article>
+            <article class="setting-card">
+              <div>
+                <strong>通知設定</strong>
+                <span>重要連絡と教室変更を通知します。</span>
+              </div>
+              <label class="switch-row">
+                <input type="checkbox" checked />
+                <span>通知ON</span>
+              </label>
+            </article>
+            <article class="setting-card">
+              <div>
+                <strong>課題締切の通知</strong>
+                <span>提出忘れ防止のリマインドです。</span>
+              </div>
+              <select aria-label="課題締切の通知タイミング">
+                <option>24時間前 / 3時間前</option>
+                <option>24時間前のみ</option>
+                <option>3時間前のみ</option>
+                <option>通知しない</option>
+              </select>
             </article>
           </div>
         </section>
@@ -55,11 +108,33 @@
           <div class="info-list">
             <article>
               <strong>人間中心設計: 資料が追加されました</strong>
+              <time class="notification-time" datetime="2026-07-09T14:08:00+09:00">2026/07/09 14:08</time>
               <span>第12回資料と期末レポートのガイドラインを確認してください。</span>
             </article>
             <article>
               <strong>英語演習: 教室変更</strong>
+              <time class="notification-time" datetime="2026-07-09T13:30:00+09:00">2026/07/09 13:30</time>
               <span>木曜1限の教室が5303に変更されました。</span>
+            </article>
+          </div>
+        </section>
+
+        <section class="page" data-page="mail" aria-label="メール">
+          <div class="simple-header">
+            <h1>メール</h1>
+            <p>授業に関係するメールを優先表示します。</p>
+          </div>
+          <div class="mail-actions">
+            <button class="compose-button" type="button">メールを作成</button>
+          </div>
+          <div class="info-list">
+            <article>
+              <strong>鈴木先生: レポート草案の確認</strong>
+              <span>期末レポートのレビュー結果を反映してから提出してください。</span>
+            </article>
+            <article>
+              <strong>教務課: 休講情報のお知らせ</strong>
+              <span>休講・補講情報は時間割にも反映されます。</span>
             </article>
           </div>
         </section>
@@ -91,6 +166,10 @@
         <button class="nav-item" type="button" data-nav-page="notifications">
           <span class="nav-icon">◇</span>
           <span>通知</span>
+        </button>
+        <button class="nav-item" type="button" data-nav-page="mail">
+          <span class="nav-icon">✉</span>
+          <span>メール</span>
         </button>
         <button class="nav-item" type="button" data-nav-page="mypage">
           <span class="nav-icon">○</span>
