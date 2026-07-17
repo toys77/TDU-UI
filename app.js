@@ -41,6 +41,7 @@ document.addEventListener("click", (event) => {
   const lesson = event.target.closest("[data-course-id]");
   const detailTab = event.target.closest("[data-detail-tab]");
   const belongingsToggle = event.target.closest("[data-toggle-belongings-notice]");
+  const sendMail = event.target.closest("[data-send-mail]");
   const close = event.target.closest("[data-close-dialog]");
 
   if (nav) {
@@ -53,6 +54,10 @@ document.addEventListener("click", (event) => {
 
   if (belongingsToggle) {
     toggleBelongingsNotice(belongingsToggle);
+  }
+
+  if (sendMail) {
+    completeMailSend(sendMail);
   }
 
   if (lesson) {
@@ -169,7 +174,8 @@ function openCourseDetail(courseId) {
           <h3>教授へのメール</h3>
           <span>宛先: ${escapeHtml(item.teacher)} &lt;${escapeHtml(item.teacherMail)}&gt;</span>
           <textarea aria-label="教授へのメール本文">先生、${escapeHtml(item.title)}について質問があります。</textarea>
-          <button class="send-preview" type="button">下書きを保存</button>
+          <button class="send-preview" type="button" data-send-mail>メールを送信</button>
+          <p class="mail-send-status" data-mail-status role="status" aria-live="polite" hidden></p>
         </div>
       </section>
       <section class="detail-panel" data-detail-panel="materials">
@@ -207,6 +213,16 @@ function toggleBelongingsNotice(button) {
   const label = button.querySelector("[data-notice-label]");
   if (label) label.textContent = nextState ? "通知ON" : "通知OFF";
   button.classList.toggle("is-off", !nextState);
+}
+
+function completeMailSend(button) {
+  const status = button.closest(".mail-draft")?.querySelector("[data-mail-status]");
+  button.textContent = "送信済み";
+  button.disabled = true;
+  if (status) {
+    status.textContent = "メールの送信が完了しました。";
+    status.hidden = false;
+  }
 }
 
 function belongingsList(value) {

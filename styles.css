@@ -273,6 +273,8 @@ dialog::backdrop { background: rgba(15,32,50,.46); backdrop-filter: blur(2px); }
 .mail-draft span { color: var(--color-text-secondary); font-size: .82rem; }
 .mail-draft textarea { min-height: 88px; resize: vertical; padding: 10px; border: 1px solid var(--color-border); border-radius: var(--radius-control); color: var(--color-text-primary); line-height: 1.5; }
 .send-preview { justify-self: end; min-height: 44px; padding: 8px 14px; border-radius: var(--radius-control); background: var(--color-primary); color: #fff; font-size: .8rem; font-weight: 700; }
+.send-preview:disabled { cursor: default; background: var(--color-text-muted); }
+.mail-send-status { margin: 2px 0 0; padding: 10px 12px; border: 1px solid #b9d4ef; border-radius: var(--radius-control); background: var(--color-primary-soft); color: var(--color-primary-hover); font-size: .84rem; font-weight: 700; line-height: 1.5; }
 .course-info-card { margin-bottom: 20px; overflow: hidden; border: 1px solid var(--color-border); border-radius: var(--radius-card); background: var(--color-surface); }
 .course-info-row { display: grid; grid-template-columns: 100px minmax(0,1fr); gap: 16px; padding: 13px 16px; border-bottom: 1px solid var(--color-divider); font-size: .88rem; line-height: 1.5; }
 .course-info-row:last-child { border-bottom: 0; }
