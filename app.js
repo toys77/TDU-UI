@@ -7,6 +7,7 @@ const periods = [
   { no: 5, time: "17:15\n-\n18:45" }
 ];
 const pageNames = new Set(["timetable", "assignments", "notifications", "mail", "mypage"]);
+const deadlineNotificationStorageKey = "tduDeadlineNotification";
 
 const courses = [
   course("mon-1", "月", 1, "材料力学", "2604", "blue", "佐々木 亮", "材料に力が加わったときの応力、ひずみ、曲げを扱う授業です。"),
@@ -34,6 +35,7 @@ let courseDialogTrigger = null;
 renderTimetable();
 initializeNavigation();
 updateDeadlineCountdowns();
+initializeDeadlineNotificationSettings();
 registerServiceWorker();
 
 document.addEventListener("click", (event) => {
@@ -42,6 +44,8 @@ document.addEventListener("click", (event) => {
   const detailTab = event.target.closest("[data-detail-tab]");
   const belongingsToggle = event.target.closest("[data-toggle-belongings-notice]");
   const sendMail = event.target.closest("[data-send-mail]");
+  const saveCustomNotification = event.target.closest("[data-save-custom-notification]");
+  const downloadAllMaterialsButton = event.target.closest("[data-download-all-materials]");
   const close = event.target.closest("[data-close-dialog]");
 
   if (nav) {
@@ -60,6 +64,14 @@ document.addEventListener("click", (event) => {
     completeMailSend(sendMail);
   }
 
+  if (saveCustomNotification) {
+    saveCustomDeadlineNotification();
+  }
+
+  if (downloadAllMaterialsButton) {
+    downloadAllMaterials(downloadAllMaterialsButton.dataset.downloadCourseId, downloadAllMaterialsButton);
+  }
+
   if (lesson) {
     courseDialogTrigger = lesson;
     openCourseDetail(lesson.dataset.courseId);
@@ -67,6 +79,12 @@ document.addEventListener("click", (event) => {
 
   if (close) {
     closeCourseDialog();
+  }
+});
+
+document.addEventListener("change", (event) => {
+  if (event.target.matches("[data-deadline-notification-select]")) {
+    updateDeadlineNotificationEditor(event.target.value, true);
   }
 });
 
@@ -179,8 +197,15 @@ function openCourseDetail(courseId) {
         </div>
       </section>
       <section class="detail-panel" data-detail-panel="materials">
-        <h3>授業資料</h3>
+        <div class="material-panel-heading">
+          <h3>授業資料</h3>
+          <button class="download-all-materials" type="button" data-download-all-materials data-download-course-id="${item.id}">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M4 20h16"/></svg>
+            全14回を一括DL
+          </button>
+        </div>
         <p class="material-note">第1回から第14回までの資料を選択できます。各項目はプロトタイプ用のダミーファイルです。</p>
+        <p class="bulk-download-status" data-bulk-download-status role="status" aria-live="polite" hidden></p>
         ${materialList(item)}
       </section>
       <section class="course-info-card" aria-label="授業情報">
@@ -275,6 +300,38 @@ function materialLink(item, number) {
   </a>`;
 }
 
+function downloadAllMaterials(courseId, button) {
+  const item = courses.find((entry) => entry.id === courseId);
+  if (!item) return;
+
+  const sections = Array.from({ length: 14 }, (_, index) => {
+    const number = index + 1;
+    return [
+      `第${number}回`,
+      `${item.title} 第${number}回 授業資料`,
+      "これはプロトタイプ用のダミーファイルです。",
+      `担当教員: ${item.teacher}`,
+      `教室: ${item.room}`
+    ].join("\n");
+  });
+  const content = `${item.title} 全14回 授業資料\n\n${sections.join("\n\n--------------------\n\n")}`;
+  const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
+  const href = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = href;
+  link.download = `${sanitizeFileName(item.title)}_全14回授業資料.txt`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(href);
+
+  const status = button.closest("[data-detail-panel]")?.querySelector("[data-bulk-download-status]");
+  if (status) {
+    status.textContent = "全14回分のダミー資料を1つのファイルにまとめてダウンロードしました。";
+    status.hidden = false;
+  }
+}
+
 function setDetailPanel(panelName) {
   document.querySelectorAll("[data-detail-tab]").forEach((tab) => {
     tab.classList.toggle("is-active", tab.dataset.detailTab === panelName);
@@ -304,11 +361,70 @@ function initializeNavigation() {
   if (hashPage) setPage(hashPage);
 }
 
+function initializeDeadlineNotificationSettings() {
+  const select = document.querySelector("[data-deadline-notification-select]");
+  if (!select) return;
+
+  let saved = null;
+  try {
+    saved = JSON.parse(localStorage.getItem(deadlineNotificationStorageKey));
+  } catch (error) {
+    console.info("Deadline notification setting could not be loaded:", error);
+  }
+
+  if (saved?.mode && [...select.options].some((option) => option.value === saved.mode)) {
+    select.value = saved.mode;
+  }
+  const valueInput = document.querySelector("[data-custom-notification-value]");
+  const unitSelect = document.querySelector("[data-custom-notification-unit]");
+  if (saved?.value && valueInput) valueInput.value = saved.value;
+  if (saved?.unit && unitSelect) unitSelect.value = saved.unit;
+  updateDeadlineNotificationEditor(select.value, false);
+}
+
+function updateDeadlineNotificationEditor(mode, shouldSave) {
+  const editor = document.querySelector("[data-custom-notification-editor]");
+  const status = document.querySelector("[data-notification-setting-status]");
+  if (!editor) return;
+
+  editor.hidden = mode !== "custom";
+  if (status) status.textContent = "";
+  if (!shouldSave || mode === "custom") return;
+
+  saveDeadlineNotificationSetting({ mode });
+  if (status) status.textContent = "通知タイミングを保存しました。";
+}
+
+function saveCustomDeadlineNotification() {
+  const valueInput = document.querySelector("[data-custom-notification-value]");
+  const unitSelect = document.querySelector("[data-custom-notification-unit]");
+  const status = document.querySelector("[data-notification-setting-status]");
+  if (!valueInput || !unitSelect) return;
+
+  const value = Math.min(99, Math.max(1, Number.parseInt(valueInput.value, 10) || 1));
+  const unit = unitSelect.value === "days" ? "days" : "hours";
+  valueInput.value = value;
+  saveDeadlineNotificationSetting({ mode: "custom", value, unit });
+  if (status) {
+    status.textContent = `締切の${value}${unit === "days" ? "日前" : "時間前"}に通知する設定を保存しました。`;
+  }
+}
+
+function saveDeadlineNotificationSetting(setting) {
+  try {
+    localStorage.setItem(deadlineNotificationStorageKey, JSON.stringify(setting));
+  } catch (error) {
+    console.info("Deadline notification setting could not be saved:", error);
+  }
+}
+
 function updateDeadlineCountdowns() {
   const now = new Date();
   document.querySelectorAll(".deadline-line").forEach((line) => {
     const dateElement = line.querySelector(".deadline-date");
     const badge = line.querySelector(".countdown-badge");
+    const card = line.closest(".mini-card");
+    const action = card?.querySelector(".mini-action");
     if (!dateElement || !badge) return;
 
     const due = new Date(dateElement.dateTime);
@@ -318,7 +434,21 @@ function updateDeadlineCountdowns() {
     if (diffMs <= 0) {
       badge.textContent = "締切超過";
       badge.classList.add("is-overdue");
+      if (action) {
+        const assignmentName = card.querySelector("strong")?.textContent.trim() || "この課題";
+        action.textContent = "期限切れ";
+        action.disabled = true;
+        action.classList.add("is-expired");
+        action.setAttribute("aria-label", `${assignmentName}は提出期限を過ぎています`);
+      }
       return;
+    }
+
+    if (action) {
+      action.textContent = "提出";
+      action.disabled = false;
+      action.classList.remove("is-expired");
+      action.removeAttribute("aria-label");
     }
 
     const hours = Math.ceil(diffMs / (1000 * 60 * 60));

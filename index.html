@@ -13,8 +13,8 @@
     <link rel="manifest" href="manifest.webmanifest" />
     <link rel="icon" href="icons/icon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="icons/icon-192.png" />
-    <link rel="stylesheet" href="styles.css?v=12" />
-    <script src="app.js?v=12" defer></script>
+    <link rel="stylesheet" href="styles.css?v=13" />
+    <script src="app.js?v=13" defer></script>
   </head>
   <body>
     <div class="phone-shell">
@@ -84,12 +84,25 @@
                 <strong>課題締切の通知</strong>
                 <span>提出忘れ防止のリマインドです。</span>
               </div>
-              <select aria-label="課題締切の通知タイミング">
-                <option>24時間前 / 3時間前</option>
-                <option>24時間前のみ</option>
-                <option>3時間前のみ</option>
-                <option>通知しない</option>
+              <select aria-label="課題締切の通知タイミング" data-deadline-notification-select>
+                <option value="24-and-3">24時間前 / 3時間前</option>
+                <option value="24-hours">24時間前のみ</option>
+                <option value="3-hours">3時間前のみ</option>
+                <option value="off">通知しない</option>
+                <option value="custom">自分で設定</option>
               </select>
+              <div class="custom-notification-editor" data-custom-notification-editor hidden>
+                <label>
+                  <span>締切の</span>
+                  <input type="number" min="1" max="99" value="12" inputmode="numeric" aria-label="通知する数値" data-custom-notification-value />
+                  <select aria-label="通知する単位" data-custom-notification-unit>
+                    <option value="hours">時間前</option>
+                    <option value="days">日前</option>
+                  </select>
+                </label>
+                <button type="button" data-save-custom-notification>設定する</button>
+                <p data-notification-setting-status role="status" aria-live="polite"></p>
+              </div>
             </article>
           </div>
         </section>
