@@ -427,7 +427,7 @@ function updateDeadlineCountdowns() {
     const action = card?.querySelector(".mini-action");
     if (!dateElement || !badge) return;
 
-    const due = new Date(dateElement.dateTime);
+    const due = resolveDeadline(dateElement, now);
     const diffMs = due - now;
     if (Number.isNaN(due.getTime())) return;
 
@@ -452,14 +452,47 @@ function updateDeadlineCountdowns() {
     }
 
     const hours = Math.ceil(diffMs / (1000 * 60 * 60));
+    if (isSameLocalDate(due, now)) {
+      badge.textContent = `本日締切・あと${hours}時間`;
+      badge.classList.add("is-urgent");
+      return;
+    }
+
     if (hours < 24) {
       badge.textContent = `あと${hours}時間`;
       badge.classList.add("is-urgent");
       return;
     }
 
-    badge.textContent = `あと${Math.ceil(hours / 24)}日`;
+    badge.textContent = `あと${calendarDaysBetween(now, due)}日`;
   });
+}
+
+function resolveDeadline(dateElement, now) {
+  const offset = Number.parseInt(dateElement.dataset.deadlineOffset, 10);
+  if (Number.isNaN(offset)) return new Date(dateElement.dateTime);
+
+  const hour = Number.parseInt(dateElement.dataset.deadlineHour, 10) || 0;
+  const minute = Number.parseInt(dateElement.dataset.deadlineMinute, 10) || 0;
+  const due = new Date(now);
+  due.setDate(now.getDate() + offset);
+  due.setHours(hour, minute, 0, 0);
+
+  dateElement.dateTime = due.toISOString();
+  dateElement.textContent = `${due.getMonth() + 1}/${due.getDate()} ${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
+  return due;
+}
+
+function isSameLocalDate(left, right) {
+  return left.getFullYear() === right.getFullYear()
+    && left.getMonth() === right.getMonth()
+    && left.getDate() === right.getDate();
+}
+
+function calendarDaysBetween(from, to) {
+  const fromDate = Date.UTC(from.getFullYear(), from.getMonth(), from.getDate());
+  const toDate = Date.UTC(to.getFullYear(), to.getMonth(), to.getDate());
+  return Math.max(1, Math.round((toDate - fromDate) / (1000 * 60 * 60 * 24)));
 }
 
 function escapeHtml(value) {
